@@ -9,7 +9,10 @@ import com.example.identitymanager.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -41,5 +44,27 @@ public class UserServiceImp implements UserService {
     public void deleteUserById(Long id) {
         Users userEntity = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("user with id "+ id + " does not exists"));
         userRepository.delete(userEntity);
+    }
+
+    @Override
+    public UserResponseDto updateUser(Map<String, Object> data, Long id) {
+        Users userEntity = userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " does not exist"));
+
+        data.forEach((key, value) -> {
+            switch (key) {
+                case "firstName" -> userEntity.setFirstName((String) value);
+                case "lastName" -> userEntity.setLastName((String) value);
+                case "middleName" -> userEntity.setMiddleName((String) value);
+                case "age" -> userEntity.setAge((Integer) value);
+                case "dob" -> userEntity.setDob((Date) value);
+                case "gender" -> userEntity.setGender((String) value);
+                case "email" -> userEntity.setEmail((String) value);
+                default -> throw new IllegalArgumentException("Unknown field: " + key);
+            }
+        });
+
+        Users updatedUser = userRepository.save(userEntity);
+        return mapper.toUserResponseDto(updatedUser);
     }
 }

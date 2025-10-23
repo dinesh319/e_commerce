@@ -9,6 +9,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(path = "/users")
@@ -39,6 +41,12 @@ public class UserController {
     public ResponseEntity<Void> deleteUserById(@PathVariable(name = "id") Long id){
         userService.deleteUserById(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<UserResponseDto> updateUser(@PathVariable(name = "id") Long id ,@RequestBody Map<String , Object> data){
+        UserResponseDto updatedUser = userService.updateUser(data ,id);
+        return new ResponseEntity<>(updatedUser , HttpStatus.OK);
     }
 
 
